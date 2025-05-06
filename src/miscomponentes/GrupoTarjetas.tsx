@@ -18,7 +18,7 @@ function GrupoTarjetas() {
   const [flippedCards, setFlippedCards] = useState([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(20);
-  const [isProcessing, setIsProcessing] = useState(false); // Estado para bloquear clics mientras procesamos cartas
+  const [isProcessing, setIsProcessing] = useState(false); 
 
   // Temporizador
   useEffect(() => {
@@ -39,7 +39,7 @@ function GrupoTarjetas() {
     setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
-      setIsProcessing(true); // Bloquea clics durante la comparación de cartas
+      setIsProcessing(true); 
       const [card1, card2] = newFlipped;
       if (card1.nombre === card2.nombre) {
         // Coincidencia
@@ -50,7 +50,7 @@ function GrupoTarjetas() {
           setCards(updated);
           setFlippedCards([]);
           setScore((s) => s + 1);
-          setIsProcessing(false); // Habilita clics después de procesar
+          setIsProcessing(false); 
         }, 500);
       } else {
         // No hay coincidencia
@@ -60,7 +60,7 @@ function GrupoTarjetas() {
           updated[card2.index].isFlipped = false;
           setCards(updated);
           setFlippedCards([]);
-          setIsProcessing(false); // Habilita clics después de procesar
+          setIsProcessing(false); 
         }, 1000);
       }
     }
