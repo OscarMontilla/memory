@@ -18,7 +18,6 @@ function GrupoTarjetas() {
   const [flippedCards, setFlippedCards] = useState([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(20);
-  const [isProcessing, setIsProcessing] = useState(false); // Estado para bloquear clics mientras procesamos cartas
 
   // Temporizador
   useEffect(() => {
@@ -28,7 +27,7 @@ function GrupoTarjetas() {
   }, [time]);
 
   const handleCardClick = (index) => {
-    if (cards[index].isFlipped || cards[index].isMatched || flippedCards.length === 2 || isProcessing || time <= 0) return;
+    if (cards[index].isFlipped || cards[index].isMatched || flippedCards.length === 2) return;
 
     incrementGlobalClicks();
 
@@ -39,10 +38,9 @@ function GrupoTarjetas() {
     setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
-      setIsProcessing(true); // Bloquea clics durante la comparación de cartas
       const [card1, card2] = newFlipped;
       if (card1.nombre === card2.nombre) {
-        // Coincidencia
+        // Match!
         setTimeout(() => {
           const updated = [...newCards];
           updated[card1.index].isMatched = true;
@@ -50,17 +48,15 @@ function GrupoTarjetas() {
           setCards(updated);
           setFlippedCards([]);
           setScore((s) => s + 1);
-          setIsProcessing(false); // Habilita clics después de procesar
         }, 500);
       } else {
-        // No hay coincidencia
+        // No match
         setTimeout(() => {
           const updated = [...newCards];
           updated[card1.index].isFlipped = false;
           updated[card2.index].isFlipped = false;
           setCards(updated);
           setFlippedCards([]);
-          setIsProcessing(false); // Habilita clics después de procesar
         }, 1000);
       }
     }
