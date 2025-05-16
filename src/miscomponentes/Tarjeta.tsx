@@ -4,7 +4,7 @@ import { useClickContext } from "./ClickContext";
 
 function Tarjeta({ nombre, imagen, isFlipped, onClick }) {
   const [clicks, setClicks] = useState(0); 
-  const { incrementGlobalClicks } = useClickContext();
+  const { incrementGlobalClicks } = useClickContext(); 
 
   const handleClick = () => {
     setClicks(clicks + 1); 
@@ -25,9 +25,9 @@ function Tarjeta({ nombre, imagen, isFlipped, onClick }) {
     userSelect: "none",
     display: "flex",
     flexDirection: "column", 
-    justifyContent: "center",
+    justifyContent: "center", 
     alignItems: "center", 
-    padding: "10px", 
+    padding: "10px",
   };
 
   return (
