@@ -18,10 +18,9 @@ function GrupoTarjetas() {
   const [flippedCards, setFlippedCards] = useState([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(20);
-<<<<<<< HEAD
-=======
+
   const [isProcessing, setIsProcessing] = useState(false); 
->>>>>>> d18ec34497831f0c2d2c48655027d2f576dfa364
+
 
   // Temporizador
   useEffect(() => {
@@ -42,10 +41,8 @@ function GrupoTarjetas() {
     setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
-<<<<<<< HEAD
-=======
       setIsProcessing(true); 
->>>>>>> d18ec34497831f0c2d2c48655027d2f576dfa364
+
       const [card1, card2] = newFlipped;
       if (card1.nombre === card2.nombre) {
         // Match!
@@ -56,10 +53,8 @@ function GrupoTarjetas() {
           setCards(updated);
           setFlippedCards([]);
           setScore((s) => s + 1);
-<<<<<<< HEAD
-=======
           setIsProcessing(false); 
->>>>>>> d18ec34497831f0c2d2c48655027d2f576dfa364
+
         }, 500);
       } else {
         // No match
