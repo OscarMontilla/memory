@@ -3,7 +3,25 @@ import React, { useEffect, useState } from "react";
 import Tarjeta from "./Tarjeta";
 import { useClickContext } from "./ClickContext";
 
-type PokemonCard = {
+
+interface PokemonResult {
+  name: string;
+  url: string;
+}
+
+interface PokemonDetails {
+  id: number;
+  name: string;
+  sprites: {
+    front_default: string;
+  };
+}
+
+interface ApiResponse {
+  results: PokemonResult[];
+}
+
+interface PokemonCard {
   id: number;
   nombre: string;
   imagen: string;
@@ -11,7 +29,7 @@ type PokemonCard = {
   isMatched: boolean;
 }
 
-type FlippedCard = PokemonCard & {
+interface FlippedCard extends PokemonCard {
   index: number;
 }
 
@@ -28,15 +46,15 @@ function GrupoTarjetas() {
     const fetchPokemons = async () => {
       try {
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=6');
-        const data = await response.json();
+        const data: ApiResponse = await response.json();
         
-        const pokemonPromises = data.results.map((pokemon: { url: string }) => 
+        const pokemonPromises = data.results.map((pokemon: PokemonResult) => 
           fetch(pokemon.url).then(res => res.json())
         );
         
-        const pokemonDetails = await Promise.all(pokemonPromises);
+        const pokemonDetails = await Promise.all<PokemonDetails>(pokemonPromises);
         
-        const pokemonCards = pokemonDetails.flatMap(pokemon => [
+        const pokemonCards: PokemonCard[] = pokemonDetails.flatMap(pokemon => [
           {
             id: pokemon.id,
             nombre: pokemon.name,
