@@ -78,7 +78,7 @@ function GrupoTarjetas() {
     return () => clearTimeout(timer);
   }, [time]);
 
-  const handleCardClick = (index) => {
+  const handleCardClick = (index: number): void => {
     if (cards[index].isFlipped || cards[index].isMatched || flippedCards.length === 2) return;
 
     incrementGlobalClicks();
