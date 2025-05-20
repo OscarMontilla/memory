@@ -3,6 +3,16 @@ import React, { useEffect, useState } from "react";
 import Tarjeta from "./Tarjeta";
 import { useClickContext } from "./ClickContext";
 
+// Add interfaces for the API responses
+interface PokemonResult {
+  name: string;
+  url: string;
+}
+
+interface ApiResponse {
+  results: PokemonResult[];
+}
+
 function GrupoTarjetas() {
   const { totalClicks, incrementGlobalClicks } = useClickContext();
   const [cards, setCards] = useState([]);
@@ -15,12 +25,11 @@ function GrupoTarjetas() {
   useEffect(() => {
     const fetchPokemons = async () => {
       try {
-        // Obtener 6 pokémons (que se convertirán en 12 cartas al hacer parejas)
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=6');
-        const data = await response.json();
+        const data: ApiResponse = await response.json();
         
-        // Hacer todas las peticiones en paralelo
-        const pokemonPromises = data.results.map(pokemon => 
+        // Now pokemon is properly typed as PokemonResult
+        const pokemonPromises = data.results.map((pokemon: PokemonResult) => 
           fetch(pokemon.url).then(res => res.json())
         );
         
