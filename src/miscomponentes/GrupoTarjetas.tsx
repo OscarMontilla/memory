@@ -66,7 +66,13 @@ function GrupoTarjetas() {
   }, [time]);
 
   const handleCardClick = (index) => {
-    if (cards[index].isFlipped || cards[index].isMatched || flippedCards.length === 2) return;
+    // Añadir isProcessing a la condición de retorno
+    if (
+      cards[index].isFlipped || 
+      cards[index].isMatched || 
+      flippedCards.length === 2 ||
+      isProcessing
+    ) return;
 
     incrementGlobalClicks();
 
@@ -77,9 +83,9 @@ function GrupoTarjetas() {
     setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
-      setIsProcessing(true); 
-
+      setIsProcessing(true);
       const [card1, card2] = newFlipped;
+      
       if (card1.nombre === card2.nombre) {
         // Match!
         setTimeout(() => {
@@ -89,8 +95,7 @@ function GrupoTarjetas() {
           setCards(updated);
           setFlippedCards([]);
           setScore((s) => s + 1);
-          setIsProcessing(false); 
-
+          setIsProcessing(false);
         }, 500);
       } else {
         // No match
@@ -100,6 +105,7 @@ function GrupoTarjetas() {
           updated[card2.index].isFlipped = false;
           setCards(updated);
           setFlippedCards([]);
+          setIsProcessing(false); // Añadir esta línea
         }, 1000);
       }
     }
