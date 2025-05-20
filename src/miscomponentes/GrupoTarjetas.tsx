@@ -13,10 +13,18 @@ interface ApiResponse {
   results: PokemonResult[];
 }
 
+interface PokemonCard {
+  id: number;
+  nombre: string;
+  imagen: string;
+  isFlipped: boolean;
+  isMatched: boolean;
+}
+
 function GrupoTarjetas() {
   const { totalClicks, incrementGlobalClicks } = useClickContext();
-  const [cards, setCards] = useState([]);
-  const [flippedCards, setFlippedCards] = useState([]);
+  const [cards, setCards] = useState<PokemonCard[]>([]);
+  const [flippedCards, setFlippedCards] = useState<PokemonCard[]>([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(20);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -28,15 +36,13 @@ function GrupoTarjetas() {
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=6');
         const data: ApiResponse = await response.json();
         
-        // Now pokemon is properly typed as PokemonResult
         const pokemonPromises = data.results.map((pokemon: PokemonResult) => 
           fetch(pokemon.url).then(res => res.json())
         );
         
         const pokemonDetails = await Promise.all(pokemonPromises);
         
-        // Crear el array de tarjetas con los datos obtenidos (dos de cada pokemon)
-        const pokemonCards = pokemonDetails.flatMap(pokemon => [
+        const pokemonCards: PokemonCard[] = pokemonDetails.flatMap(pokemon => [
           {
             id: pokemon.id,
             nombre: pokemon.name,
@@ -45,7 +51,7 @@ function GrupoTarjetas() {
             isMatched: false
           },
           {
-            id: pokemon.id + 1000, // ID único para la pareja
+            id: pokemon.id + 1000,
             nombre: pokemon.name,
             imagen: pokemon.sprites.front_default,
             isFlipped: false,
@@ -53,9 +59,7 @@ function GrupoTarjetas() {
           }
         ]);
 
-        // Mezclar las cartas de forma aleatoria
         const shuffledCards = pokemonCards.sort(() => Math.random() - 0.5);
-        
         setCards(shuffledCards);
         setLoading(false);
       } catch (error) {
