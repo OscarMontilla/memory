@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, CSSProperties } from "react";
 import { useClickContext } from "./ClickContext";
 
 interface TarjetaProps {
@@ -19,7 +19,7 @@ function Tarjeta({ nombre, imagen, isFlipped, onClick }: TarjetaProps) {
     if (onClick) onClick();
   };
 
-  const cardStyle = {
+  const cardStyle: CSSProperties = {
     width: "120px",
     height: "150px",
     margin: "10px",
