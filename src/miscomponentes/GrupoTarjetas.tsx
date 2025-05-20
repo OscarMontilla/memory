@@ -21,10 +21,14 @@ interface PokemonCard {
   isMatched: boolean;
 }
 
+interface FlippedCard extends PokemonCard {
+  index: number;
+}
+
 function GrupoTarjetas() {
   const { totalClicks, incrementGlobalClicks } = useClickContext();
   const [cards, setCards] = useState<PokemonCard[]>([]);
-  const [flippedCards, setFlippedCards] = useState<PokemonCard[]>([]);
+  const [flippedCards, setFlippedCards] = useState<FlippedCard[]>([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(20);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -85,12 +89,12 @@ function GrupoTarjetas() {
 
     const newCards = [...cards];
     newCards[index].isFlipped = true;
-    const newFlipped = [...flippedCards, { ...newCards[index], index }];
+    const newFlipped = [...flippedCards, { ...newCards[index], index }] as FlippedCard[];
     setCards(newCards);
     setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
-      setIsProcessing(true); 
+      setIsProcessing(true);
 
       const [card1, card2] = newFlipped;
       if (card1.nombre === card2.nombre) {
@@ -102,8 +106,7 @@ function GrupoTarjetas() {
           setCards(updated);
           setFlippedCards([]);
           setScore((s) => s + 1);
-          setIsProcessing(false); 
-
+          setIsProcessing(false);
         }, 500);
       } else {
         // No match
@@ -113,6 +116,7 @@ function GrupoTarjetas() {
           updated[card2.index].isFlipped = false;
           setCards(updated);
           setFlippedCards([]);
+          setIsProcessing(false);
         }, 1000);
       }
     }
