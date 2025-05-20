@@ -9,6 +9,14 @@ interface PokemonResult {
   url: string;
 }
 
+interface PokemonDetails {
+  id: number;
+  name: string;
+  sprites: {
+    front_default: string;
+  };
+}
+
 interface ApiResponse {
   results: PokemonResult[];
 }
@@ -44,7 +52,7 @@ function GrupoTarjetas() {
           fetch(pokemon.url).then(res => res.json())
         );
         
-        const pokemonDetails = await Promise.all(pokemonPromises);
+        const pokemonDetails = await Promise.all<PokemonDetails>(pokemonPromises);
         
         const pokemonCards: PokemonCard[] = pokemonDetails.flatMap(pokemon => [
           {
