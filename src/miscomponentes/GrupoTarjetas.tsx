@@ -3,22 +3,10 @@ import React, { useEffect, useState } from "react";
 import Tarjeta from "./Tarjeta";
 import { useClickContext } from "./ClickContext";
 
-type PokemonCard = {
-  id: number;
-  nombre: string;
-  imagen: string;
-  isFlipped: boolean;
-  isMatched: boolean;
-}
-
-type FlippedCard = PokemonCard & {
-  index: number;
-}
-
 function GrupoTarjetas() {
   const { totalClicks, incrementGlobalClicks } = useClickContext();
-  const [cards, setCards] = useState<PokemonCard[]>([]);
-  const [flippedCards, setFlippedCards] = useState<FlippedCard[]>([]);
+  const [cards, setCards] = useState([]);
+  const [flippedCards, setFlippedCards] = useState([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(20);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -27,15 +15,18 @@ function GrupoTarjetas() {
   useEffect(() => {
     const fetchPokemons = async () => {
       try {
+        // Obtener 6 pokémons (que se convertirán en 12 cartas al hacer parejas)
         const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=6');
         const data = await response.json();
         
-        const pokemonPromises = data.results.map((pokemon: { url: string }) => 
+        // Hacer todas las peticiones en paralelo
+        const pokemonPromises = data.results.map(pokemon => 
           fetch(pokemon.url).then(res => res.json())
         );
         
         const pokemonDetails = await Promise.all(pokemonPromises);
         
+        // Crear el array de tarjetas con los datos obtenidos (dos de cada pokemon)
         const pokemonCards = pokemonDetails.flatMap(pokemon => [
           {
             id: pokemon.id,
@@ -45,7 +36,7 @@ function GrupoTarjetas() {
             isMatched: false
           },
           {
-            id: pokemon.id + 1000,
+            id: pokemon.id + 1000, // ID único para la pareja
             nombre: pokemon.name,
             imagen: pokemon.sprites.front_default,
             isFlipped: false,
@@ -53,7 +44,9 @@ function GrupoTarjetas() {
           }
         ]);
 
+        // Mezclar las cartas de forma aleatoria
         const shuffledCards = pokemonCards.sort(() => Math.random() - 0.5);
+        
         setCards(shuffledCards);
         setLoading(false);
       } catch (error) {
@@ -72,19 +65,19 @@ function GrupoTarjetas() {
     return () => clearTimeout(timer);
   }, [time]);
 
-  const handleCardClick = (index: number): void => {
+  const handleCardClick = (index) => {
     if (cards[index].isFlipped || cards[index].isMatched || flippedCards.length === 2) return;
 
     incrementGlobalClicks();
 
     const newCards = [...cards];
     newCards[index].isFlipped = true;
-    const newFlipped = [...flippedCards, { ...newCards[index], index }] as FlippedCard[];
+    const newFlipped = [...flippedCards, { ...newCards[index], index }];
     setCards(newCards);
     setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
-      setIsProcessing(true);
+      setIsProcessing(true); 
 
       const [card1, card2] = newFlipped;
       if (card1.nombre === card2.nombre) {
@@ -96,7 +89,8 @@ function GrupoTarjetas() {
           setCards(updated);
           setFlippedCards([]);
           setScore((s) => s + 1);
-          setIsProcessing(false);
+          setIsProcessing(false); 
+
         }, 500);
       } else {
         // No match
@@ -106,7 +100,6 @@ function GrupoTarjetas() {
           updated[card2.index].isFlipped = false;
           setCards(updated);
           setFlippedCards([]);
-          setIsProcessing(false);
         }, 1000);
       }
     }
