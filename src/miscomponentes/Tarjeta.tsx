@@ -1,15 +1,22 @@
 "use client";
 import React, { useState } from "react";
-import { useClickContext } from "./ClickContext"; 
+import { useClickContext } from "./ClickContext";
 
-function Tarjeta({ nombre, imagen, isFlipped, onClick }) {
-  const [clicks, setClicks] = useState(0); 
-  const { incrementGlobalClicks } = useClickContext(); 
+interface TarjetaProps {
+  nombre: string;
+  imagen: string;
+  isFlipped: boolean;
+  onClick: () => void;
+}
+
+function Tarjeta({ nombre, imagen, isFlipped, onClick }: TarjetaProps) {
+  const [clicks, setClicks] = useState(0);
+  const { incrementGlobalClicks } = useClickContext();
 
   const handleClick = () => {
-    setClicks(clicks + 1); 
-    incrementGlobalClicks(); 
-    if (onClick) onClick(); 
+    setClicks(clicks + 1);
+    incrementGlobalClicks();
+    if (onClick) onClick();
   };
 
   const cardStyle = {
@@ -19,14 +26,14 @@ function Tarjeta({ nombre, imagen, isFlipped, onClick }) {
     border: "1px solid #ccc",
     borderRadius: "10px",
     textAlign: "center",
-    backgroundColor: isFlipped ? "#f0f0f0" : "blue", 
-    color: isFlipped ? "black" : "white", 
+    backgroundColor: isFlipped ? "#f0f0f0" : "blue",
+    color: isFlipped ? "black" : "white",
     cursor: "pointer",
     userSelect: "none",
     display: "flex",
-    flexDirection: "column", 
-    justifyContent: "center", 
-    alignItems: "center", 
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
     padding: "10px",
   };
 
@@ -40,16 +47,16 @@ function Tarjeta({ nombre, imagen, isFlipped, onClick }) {
             style={{
               width: "100px",
               height: "100px",
-              objectFit: "contain", 
-              marginBottom: "10px", 
+              objectFit: "contain",
+              marginBottom: "10px",
             }}
           />
           <div>
-            <p>Clics: {clicks}</p> 
+            <p>Clics: {clicks}</p>
           </div>
         </>
       ) : (
-        <div></div> 
+        <div></div>
       )}
     </div>
   );
