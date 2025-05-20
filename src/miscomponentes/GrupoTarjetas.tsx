@@ -3,24 +3,60 @@ import React, { useEffect, useState } from "react";
 import Tarjeta from "./Tarjeta";
 import { useClickContext } from "./ClickContext";
 
-const tarjetasOriginales = [
-  { id: 1, nombre: "Raticate", imagen: "https://images.wikidexcdn.net/mwuploads/wikidex/thumb/d/d6/latest/20200307022931/Raticate.png/800px-Raticate.png" },
-  { id: 2, nombre: "Psyduck", imagen: "https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/art/psyduck.png" },
-  { id: 3, nombre: "Raticate", imagen: "https://images.wikidexcdn.net/mwuploads/wikidex/thumb/d/d6/latest/20200307022931/Raticate.png/800px-Raticate.png" }, // pareja
-  { id: 4, nombre: "Psyduck", imagen: "https://www.pokemon.com/static-assets/content-assets/cms2/img/video-games/_tiles/pokemon-unite/art/psyduck.png" },  // pareja
-];
-
 function GrupoTarjetas() {
   const { totalClicks, incrementGlobalClicks } = useClickContext();
-  const [cards, setCards] = useState(
-    tarjetasOriginales.map((card) => ({ ...card, isFlipped: false, isMatched: false }))
-  );
+  const [cards, setCards] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(20);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [isProcessing, setIsProcessing] = useState(false); 
+  useEffect(() => {
+    const fetchPokemons = async () => {
+      try {
+        // Obtener 6 pokémons (que se convertirán en 12 cartas al hacer parejas)
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=6');
+        const data = await response.json();
+        
+        // Hacer todas las peticiones en paralelo
+        const pokemonPromises = data.results.map(pokemon => 
+          fetch(pokemon.url).then(res => res.json())
+        );
+        
+        const pokemonDetails = await Promise.all(pokemonPromises);
+        
+        // Crear el array de tarjetas con los datos obtenidos (dos de cada pokemon)
+        const pokemonCards = pokemonDetails.flatMap(pokemon => [
+          {
+            id: pokemon.id,
+            nombre: pokemon.name,
+            imagen: pokemon.sprites.front_default,
+            isFlipped: false,
+            isMatched: false
+          },
+          {
+            id: pokemon.id + 1000, // ID único para la pareja
+            nombre: pokemon.name,
+            imagen: pokemon.sprites.front_default,
+            isFlipped: false,
+            isMatched: false
+          }
+        ]);
 
+        // Mezclar las cartas de forma aleatoria
+        const shuffledCards = pokemonCards.sort(() => Math.random() - 0.5);
+        
+        setCards(shuffledCards);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching pokemons:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchPokemons();
+  }, []);
 
   // Temporizador
   useEffect(() => {
@@ -74,16 +110,28 @@ function GrupoTarjetas() {
       <h2>Tiempo: {time}s</h2>
       <h2>Clicks globales: {totalClicks}</h2>
       <h2>Puntuación: {score}</h2>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
-        {cards.map((card, i) => (
-          <Tarjeta
-            key={i}
-            imagen={card.imagen}
-            nombre={card.nombre}
-            isFlipped={card.isFlipped || card.isMatched}
-            onClick={() => handleCardClick(i)}
-          />
-        ))}
+      <div style={{ 
+        display: "grid",
+        gridTemplateRows: "repeat(2, 1fr)", // 2 filas
+        gridTemplateColumns: "repeat(6, 1fr)", // 6 columnas
+        gap: "1rem",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        padding: "1rem"
+      }}>
+        {loading ? (
+          <p>Cargando Pokémons...</p>
+        ) : (
+          cards.map((card, i) => (
+            <Tarjeta
+              key={i}
+              imagen={card.imagen}
+              nombre={card.nombre}
+              isFlipped={card.isFlipped || card.isMatched}
+              onClick={() => handleCardClick(i)}
+            />
+          ))
+        )}
       </div>
     </div>
   );
