@@ -10,7 +10,7 @@ interface ResultadoPokemon {
 
 interface DetallesPokemon {
   id: number;
-  nombre: string;
+  nombre: string; 
   sprites: {
     front_default: string;
   };
@@ -56,14 +56,14 @@ function GrupoTarjetas() {
         const pokemonCards: TarjetaPokemon[] = pokemonDetails.flatMap(pokemon => [
           {
             id: pokemon.id,
-            nombre: pokemon.name,
+            nombre: pokemon.nombre,  
             imagen: pokemon.sprites.front_default,
             isFlipped: false,
             isMatched: false
           },
           {
             id: pokemon.id + 1000,
-            nombre: pokemon.name,
+            nombre: pokemon.nombre, 
             imagen: pokemon.sprites.front_default,
             isFlipped: false,
             isMatched: false
