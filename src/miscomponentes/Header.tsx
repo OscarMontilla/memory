@@ -23,6 +23,16 @@ export function Header() {
           <Link href="/acerca">Acerca</Link>
         </MenubarTrigger>
       </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger>
+          <Link href="/registro">Registro</Link>
+        </MenubarTrigger>
+      </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger>
+          <Link href="/login">Login</Link>
+        </MenubarTrigger>
+      </MenubarMenu>
     </Menubar>
   );
 }
