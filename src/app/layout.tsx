@@ -28,14 +28,15 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AuthCheck />
-        <header>
-          <Header />
-        </header>
-        <main className="container mx-auto p-4">
-          {children}
-        </main>
-        <footer></footer>
+        <AuthCheck>
+          <header>
+            <Header />
+          </header>
+          <main className="container mx-auto p-4">
+            {children}
+          </main>
+          <footer></footer>
+        </AuthCheck>
       </body>
     </html>
   );
