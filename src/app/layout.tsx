@@ -1,8 +1,8 @@
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/miscomponentes/Header";
+import AuthCheck from "@/miscomponentes/AuthCheck";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+// Movemos metadata fuera del componente cliente
+export const metadata = {
   title: "Juego Memory",
   description: "Proyecto de juego Memory",
 };
@@ -26,17 +27,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-      <header>
-        <Header></Header>
-      </header>
-      <main className="container mx-auto p-4">
-        {children}
-      </main>
-      <footer></footer>
-      
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <AuthCheck />
+        <header>
+          <Header />
+        </header>
+        <main className="container mx-auto p-4">
+          {children}
+        </main>
+        <footer></footer>
       </body>
     </html>
   );
