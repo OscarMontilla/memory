@@ -32,13 +32,24 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Guardamos el token en localStorage
         localStorage.setItem('token', data.token);
-        // También podemos guardar información del usuario si la API la devuelve
-        if(data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        router.push('/'); 
+        console.log('Token del usuario:', data.token);
+        
+        // Guardar información del usuario
+        const userInfo = {
+          email: formData.email,
+          ...data.user
+        };
+        localStorage.setItem('user', JSON.stringify(userInfo));
+        
+        // Disparar evento de cambio de autenticación
+        const event = new Event('auth-change');
+        window.dispatchEvent(event);
+        
+        // Redireccionar después de un pequeño delay
+        setTimeout(() => {
+          router.push('/home');
+        }, 100);
       } else {
         setError(data.message || 'Error en el login');
       }
