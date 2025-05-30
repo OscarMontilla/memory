@@ -6,17 +6,20 @@ interface TarjetaProps {
   nombre: string;
   imagen: string;
   isFlipped: boolean;
+  isMatched?: boolean;
   onClick: () => void;
 }
 
-function Tarjeta({ nombre, imagen, isFlipped, onClick }: TarjetaProps) {
+function Tarjeta({ nombre, imagen, isFlipped, isMatched, onClick }: TarjetaProps) {
   const [clicks, setClicks] = useState(0);
   const { incrementGlobalClicks } = useClickContext();
 
   const handleClick = () => {
-    setClicks(clicks + 1);
-    incrementGlobalClicks();
-    if (onClick) onClick();
+    if (!isFlipped && !isMatched) {
+      setClicks(clicks + 1);
+      incrementGlobalClicks();
+      onClick();
+    }
   };
 
   const cardStyle: CSSProperties = {

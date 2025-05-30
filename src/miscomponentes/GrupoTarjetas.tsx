@@ -3,24 +3,24 @@ import React, { useEffect, useState } from "react";
 import Tarjeta from "./Tarjeta";
 import { useClickContext } from "./ClickContext";
 
-interface ResultadoPokemon {
-  nombre: string;
+interface PokemonResult {
+  name: string;
   url: string;
 }
 
-interface DetallesPokemon {
+interface PokemonDetails {
   id: number;
-  nombre: string; 
+  name: string;
   sprites: {
     front_default: string;
   };
 }
 
-interface RespuestaAPI {
-  results: ResultadoPokemon[];
+interface ApiResponse {
+  results: PokemonResult[];
 }
 
-interface TarjetaPokemon {
+interface PokemonCard {
   id: number;
   nombre: string;
   imagen: string;
@@ -28,76 +28,87 @@ interface TarjetaPokemon {
   isMatched: boolean;
 }
 
-interface FlippedCard extends TarjetaPokemon {
+interface FlippedCard extends PokemonCard {
   index: number;
 }
 
 function GrupoTarjetas() {
   const { totalClicks, incrementGlobalClicks } = useClickContext();
-  const [tarjetas, setTarjetas] = useState<TarjetaPokemon[]>([]);
+  const [cards, setCards] = useState<PokemonCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<FlippedCard[]>([]);
-  const [puntuacion, setPuntuacion] = useState(0);
-  const [tiempo, setTiempo] = useState(20);
+  const [score, setScore] = useState(0);
+  const [time, setTime] = useState(20);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [cargando, setCargando] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
+
+  const fetchPokemons = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=6');
+      const data: ApiResponse = await response.json();
+      
+      const pokemonPromises = data.results.map((pokemon: PokemonResult) => 
+        fetch(pokemon.url).then(res => res.json())
+      );
+      
+      const pokemonDetails = await Promise.all<PokemonDetails>(pokemonPromises);
+      
+      const pokemonCards: PokemonCard[] = pokemonDetails.flatMap(pokemon => [
+        {
+          id: pokemon.id,
+          nombre: pokemon.name,
+          imagen: pokemon.sprites.front_default,
+          isFlipped: false,
+          isMatched: false
+        },
+        {
+          id: pokemon.id + 1000,
+          nombre: pokemon.name,
+          imagen: pokemon.sprites.front_default,
+          isFlipped: false,
+          isMatched: false
+        }
+      ]);
+
+      const shuffledCards = pokemonCards.sort(() => Math.random() - 0.5);
+      setCards(shuffledCards);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching pokemons:", error);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPokemons = async () => {
-      try {
-        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=6');
-        const data: RespuestaAPI = await response.json();
-        
-        const pokemonPromises = data.results.map((pokemon: ResultadoPokemon) => 
-          fetch(pokemon.url).then(res => res.json())
-        );
-        
-        const pokemonDetails = await Promise.all<DetallesPokemon>(pokemonPromises);
-        
-        const pokemonCards: TarjetaPokemon[] = pokemonDetails.flatMap(pokemon => [
-          {
-            id: pokemon.id,
-            nombre: pokemon.nombre,  
-            imagen: pokemon.sprites.front_default,
-            isFlipped: false,
-            isMatched: false
-          },
-          {
-            id: pokemon.id + 1000,
-            nombre: pokemon.nombre, 
-            imagen: pokemon.sprites.front_default,
-            isFlipped: false,
-            isMatched: false
-          }
-        ]);
-
-        const shuffledCards = pokemonCards.sort(() => Math.random() - 0.5);
-        setTarjetas(shuffledCards);
-        setCargando(false);
-      } catch (error) {
-        console.error("Error fetching pokemons:", error);
-        setCargando(false);
-      }
-    };
-
     fetchPokemons();
   }, []);
 
-  // Temporizador
   useEffect(() => {
-    if (tiempo <= 0) return;
-    const timer = setTimeout(() => setTiempo((t) => t - 1), 1000);
+    if (time <= 0) {
+      setGameOver(true);
+      return;
+    }
+    const timer = setTimeout(() => setTime((t) => t - 1), 1000);
     return () => clearTimeout(timer);
-  }, [tiempo]);
+  }, [time]);
 
-  const manejarClickTarjeta = (indice: number): void => {
-    if (tarjetas[indice].isFlipped || tarjetas[indice].isMatched || flippedCards.length === 2) return;
+  const resetGame = () => {
+    setTime(20);
+    setScore(0);
+    setGameOver(false);
+    setFlippedCards([]);
+    setIsProcessing(false);
+    fetchPokemons();
+  };
 
-    incrementGlobalClicks();
+  const handleCardClick = (index: number): void => {
+    if (isProcessing || cards[index].isFlipped || cards[index].isMatched || flippedCards.length === 2) return;
 
-    const nuevasTarjetas = [...tarjetas];
-    nuevasTarjetas[indice].isFlipped = true;
-    const newFlipped = [...flippedCards, { ...nuevasTarjetas[indice], index: indice }] as FlippedCard[];
-    setTarjetas(nuevasTarjetas);
+    const newCards = [...cards];
+    newCards[index].isFlipped = true;
+    const newFlipped = [...flippedCards, { ...newCards[index], index }];
+    setCards(newCards);
     setFlippedCards(newFlipped);
 
     if (newFlipped.length === 2) {
@@ -105,23 +116,21 @@ function GrupoTarjetas() {
 
       const [card1, card2] = newFlipped;
       if (card1.nombre === card2.nombre) {
-        // emparejada se quedan fijas
         setTimeout(() => {
-          const updated = [...nuevasTarjetas];
+          const updated = [...newCards];
           updated[card1.index].isMatched = true;
           updated[card2.index].isMatched = true;
-          setTarjetas(updated);
+          setCards(updated);
           setFlippedCards([]);
-          setPuntuacion((s) => s + 1);
+          setScore((s) => s + 1);
           setIsProcessing(false);
         }, 500);
       } else {
-        // No emparejada se dan la vuelta
         setTimeout(() => {
-          const updated = [...nuevasTarjetas];
+          const updated = [...newCards];
           updated[card1.index].isFlipped = false;
           updated[card2.index].isFlipped = false;
-          setTarjetas(updated);
+          setCards(updated);
           setFlippedCards([]);
           setIsProcessing(false);
         }, 1000);
@@ -131,28 +140,67 @@ function GrupoTarjetas() {
 
   return (
     <div>
-      <h2>Tiempo: {tiempo}s</h2>
+      <h2>Tiempo: {time}s</h2>
       <h2>Clicks globales: {totalClicks}</h2>
-      <h2>Puntuación: {puntuacion}</h2>
+      <h2>Puntuación: {score}</h2>
+
+      {gameOver && (
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          padding: '20px',
+          borderRadius: '10px',
+          textAlign: 'center',
+          zIndex: 1000
+        }}>
+          <h2>¡Game Over!</h2>
+          <p>Puntuación final: {score}</p>
+          <button 
+            onClick={resetGame}
+            style={{
+              backgroundColor: '#4CAF50',
+              border: 'none',
+              color: 'white',
+              padding: '15px 32px',
+              textAlign: 'center',
+              textDecoration: 'none',
+              display: 'inline-block',
+              fontSize: '16px',
+              margin: '4px 2px',
+              cursor: 'pointer',
+              borderRadius: '4px'
+            }}
+          >
+            Jugar de nuevo
+          </button>
+        </div>
+      )}
+
       <div style={{ 
         display: "grid",
-        gridTemplateRows: "repeat(2, 1fr)", // 2 filas
-        gridTemplateColumns: "repeat(6, 1fr)", // 6 columnas
+        gridTemplateRows: "repeat(2, 1fr)",
+        gridTemplateColumns: "repeat(6, 1fr)",
         gap: "1rem",
         maxWidth: "1200px",
         margin: "0 auto",
-        padding: "1rem"
+        padding: "1rem",
+        opacity: gameOver ? '0.5' : '1'
       }}>
-        {cargando ? (
+        {loading ? (
           <p>Cargando Pokémons...</p>
         ) : (
-          tarjetas.map((card, i) => (
+          cards.map((card, i) => (
             <Tarjeta
               key={i}
               imagen={card.imagen}
               nombre={card.nombre}
-              isFlipped={card.isFlipped || card.isMatched}
-              onClick={() => manejarClickTarjeta(i)}
+              isFlipped={card.isFlipped}
+              isMatched={card.isMatched}
+              onClick={() => !gameOver && handleCardClick(i)}
             />
           ))
         )}
