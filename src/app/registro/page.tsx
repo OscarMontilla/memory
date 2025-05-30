@@ -89,11 +89,11 @@ export default function Registro() {
                             />
                         </div>
                         <button
-                            type="submit"
-                            className="w-full py-3 px-4 text-white font-semibold rounded-lg bg-gradient-to-r from-rose-500 via-fuchsia-500 to-purple-500 hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-                        >
-                            Registrar
-                        </button>
+    type="submit"
+    className="w-full py-3 px-4 text-white font-semibold rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 transform hover:scale-105 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+>
+    Registrarse
+</button>
                     </form>
                 </div>
             </div>
