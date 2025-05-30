@@ -51,7 +51,7 @@ export function Header() {
   };
 
   return (
-    <Menubar>
+    <Menubar className="fixed ">
       <MenubarMenu>
         <MenubarTrigger>
           <Link href="/home">Home</Link>
