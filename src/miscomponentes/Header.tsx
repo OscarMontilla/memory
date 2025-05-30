@@ -58,13 +58,13 @@ export function Header() {
         </MenubarTrigger>
       </MenubarMenu>
       
-      {hasToken && (
+      
         <MenubarMenu>
           <MenubarTrigger>
             <Link href="/juego">Juego</Link>
           </MenubarTrigger>
         </MenubarMenu>
-      )}
+      
       
       <MenubarMenu>
         <MenubarTrigger>
