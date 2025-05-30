@@ -1,15 +1,20 @@
 'use client'
+
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
-export default function AuthCheck() {
+export default function AuthCheck({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-
+  const pathname = usePathname()
+  
   useEffect(() => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    router.push('/login')
-  }, [])
+    const token = localStorage.getItem('token')
+    const publicRoutes = ['/', '/login', '/registro', '/home'] 
 
-  return null
+    if (!token && !publicRoutes.includes(pathname)) {
+      router.push('/login')
+    }
+  }, [pathname, router])
+
+  return <>{children}</>
 }
