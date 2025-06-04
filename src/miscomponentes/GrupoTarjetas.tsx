@@ -7,19 +7,14 @@ interface PokemonResult {
   name: string;
   url: string;
 }
-
 interface PokemonDetails {
   id: number;
   name: string;
-  sprites: {
-    front_default: string;
-  };
+  sprites: { front_default: string };
 }
-
 interface ApiResponse {
   results: PokemonResult[];
 }
-
 interface PokemonCard {
   id: number;
   nombre: string;
@@ -27,9 +22,17 @@ interface PokemonCard {
   isFlipped: boolean;
   isMatched: boolean;
 }
-
 interface FlippedCard extends PokemonCard {
   index: number;
+}
+
+interface Partida {
+  id: string;
+  usuario: string;
+  fecha: string;
+  hora: string;
+  puntuacion: number;
+  clics: number;
 }
 
 function GrupoTarjetas() {
@@ -93,6 +96,31 @@ function GrupoTarjetas() {
     return () => clearTimeout(timer);
   }, [time]);
 
+  // Guardar partida cuando el juego termina
+  useEffect(() => {
+    if (gameOver) {
+      const usuario = localStorage.getItem("user") || "invitado";
+      const now = new Date();
+      const fecha = now.toLocaleDateString();
+      const hora = now.toLocaleTimeString();
+
+      const nuevaPartida: Partida = {
+        id: `${now.getTime()}`,
+        usuario,
+        fecha,
+        hora,
+        puntuacion: score,
+        clics: totalClicks,
+      };
+
+      const partidasStr = localStorage.getItem("partidas") || "[]";
+      const partidas: Partida[] = JSON.parse(partidasStr);
+
+      partidas.push(nuevaPartida);
+      localStorage.setItem("partidas", JSON.stringify(partidas));
+    }
+  }, [gameOver, score, totalClicks]);
+
   const resetGame = () => {
     setTime(20);
     setScore(0);
@@ -140,56 +168,65 @@ function GrupoTarjetas() {
 
   return (
     <div>
-      <h2>Tiempo: {time}s</h2>
-      <h2>Clicks globales: {totalClicks}</h2>
-      <h2>Puntuación: {score}</h2>
-
+      <div className="flex justify-center gap-8 mb-6 flex-wrap">
+        <h2 className="bg-blue-100 text-blue-800 font-semibold px-6 py-3 rounded-lg shadow-md text-xl">
+          Tiempo: <span className="font-bold">{time}s</span>
+        </h2>
+        <h2 className="bg-green-100 text-green-800 font-semibold px-6 py-3 rounded-lg shadow-md text-xl">
+          Clicks globales: <span className="font-bold">{totalClicks}</span>
+        </h2>
+        <h2 className="bg-yellow-100 text-yellow-800 font-semibold px-6 py-3 rounded-lg shadow-md text-xl">
+          Puntuación: <span className="font-bold">{score}</span>
+        </h2>
+      </div>
+  
       {gameOver && (
-        <div style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          padding: '20px',
-          borderRadius: '10px',
-          textAlign: 'center',
-          zIndex: 1000
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            color: "white",
+            padding: "20px",
+            borderRadius: "10px",
+            textAlign: "center",
+            zIndex: 1000,
+          }}
+        >
           <h2>¡Game Over!</h2>
           <p>Puntuación final: {score}</p>
-          <button 
+          <button
             onClick={resetGame}
             style={{
-              backgroundColor: '#4CAF50',
-              border: 'none',
-              color: 'white',
-              padding: '15px 32px',
-              textAlign: 'center',
-              textDecoration: 'none',
-              display: 'inline-block',
-              fontSize: '16px',
-              margin: '4px 2px',
-              cursor: 'pointer',
-              borderRadius: '4px'
+              backgroundColor: "#4CAF50",
+              border: "none",
+              color: "white",
+              padding: "15px 32px",
+              fontSize: "16px",
+              margin: "4px 2px",
+              cursor: "pointer",
+              borderRadius: "4px",
             }}
           >
             Jugar de nuevo
           </button>
         </div>
       )}
-
-      <div style={{ 
-        display: "grid",
-        gridTemplateRows: "repeat(2, 1fr)",
-        gridTemplateColumns: "repeat(6, 1fr)",
-        gap: "1rem",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "1rem",
-        opacity: gameOver ? '0.5' : '1'
-      }}>
+  
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: "repeat(2, 1fr)",
+          gridTemplateColumns: "repeat(6, 1fr)",
+          gap: "1rem",
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "1rem",
+          opacity: gameOver ? "0.5" : "1",
+        }}
+      >
         {loading ? (
           <p>Cargando Pokémons...</p>
         ) : (
@@ -207,6 +244,7 @@ function GrupoTarjetas() {
       </div>
     </div>
   );
+  
 }
 
 export default GrupoTarjetas;

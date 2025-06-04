@@ -9,7 +9,7 @@ export default function AuthCheck({ children }: { children: React.ReactNode }) {
   
   useEffect(() => {
     const user = localStorage.getItem('user')
-    const publicRoutes = ['/', '/login', '/registro', '/home', '/acerca', '/juego']
+    const publicRoutes = ['/', '/login', '/registro', '/home', '/acerca', '/juego','/partidas']
 
     if (!user && !publicRoutes.includes(pathname)) {
       router.push('/login')

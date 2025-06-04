@@ -71,6 +71,11 @@ export function Header() {
           <Link href="/acerca">Acerca</Link>
         </MenubarTrigger>
       </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger>
+          <Link href="/partidas">partidas</Link>
+        </MenubarTrigger>
+      </MenubarMenu>
 
       {hasUser ? (
         <MenubarMenu>

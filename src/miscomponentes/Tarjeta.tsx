@@ -59,7 +59,7 @@ function Tarjeta({ nombre, imagen, isFlipped, isMatched, onClick }: TarjetaProps
           </div>
         </>
       ) : (
-        <div></div>
+        <p>?</p>
       )}
     </div>
   );

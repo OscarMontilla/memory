@@ -38,7 +38,7 @@ export default function Registro() {
     usuarios.push(nuevoUsuario)
     localStorage.setItem("usuarios", JSON.stringify(usuarios))
 
-    // Opcional: guardar usuario y token directamente
+    // Opcional: guardar usuario y token directamentea
     localStorage.setItem("user", JSON.stringify(nuevoUsuario))
     localStorage.setItem("token", nuevoUsuario.email)
 
@@ -47,7 +47,7 @@ export default function Registro() {
     window.dispatchEvent(new Event('auth-change'))
 
     setTimeout(() => {
-      window.location.href = "/login"
+      window.location.href = "/home"
     }, 2000)
   }
 
