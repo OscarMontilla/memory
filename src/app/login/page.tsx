@@ -31,7 +31,8 @@ export default function Login() {
 
     if (usuario) {
       localStorage.setItem('user', JSON.stringify(usuario))
-      window.dispatchEvent(new Event('auth-change')) // 🔔 Notifica al Header
+      localStorage.setItem('token', usuario.email) // ← Guardar token simplificado
+      window.dispatchEvent(new Event('auth-change'))
       setTimeout(() => {
         router.push('/home')
       }, 500)
@@ -59,10 +60,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              className="block text-sm font-medium mb-2"
-              htmlFor="email"
-            >
+            <label className="block text-sm font-medium mb-2" htmlFor="email">
               Email
             </label>
             <input

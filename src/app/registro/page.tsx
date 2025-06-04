@@ -38,10 +38,12 @@ export default function Registro() {
     usuarios.push(nuevoUsuario)
     localStorage.setItem("usuarios", JSON.stringify(usuarios))
 
+    // Opcional: guardar usuario y token directamente
+    localStorage.setItem("user", JSON.stringify(nuevoUsuario))
+    localStorage.setItem("token", nuevoUsuario.email)
+
     setMensaje("✅ Usuario registrado correctamente. Redirigiendo al login...")
     setTipoMensaje("success")
-
-    // 🔔 Notifica al Header por si fuera necesario en alguna ruta
     window.dispatchEvent(new Event('auth-change'))
 
     setTimeout(() => {

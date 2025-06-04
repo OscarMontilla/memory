@@ -10,13 +10,12 @@ export default function Page() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push('/juego');
+      router.push("/login");
     }
   }, [router]);
 
   return (
     <ClickProvider>
-      <h1>Memory</h1>
       <GrupoTarjetas />
     </ClickProvider>
   );
