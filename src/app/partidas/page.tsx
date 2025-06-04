@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 interface Partida {
   id: string;
-  usuario: string;
+  usuario: string; // se espera que sea JSON string o email directamente
   fecha: string;
   hora: string;
   puntuacion: number;
@@ -37,6 +37,16 @@ export default function PartidasPage() {
   const partidasPropias = partidas.filter((p) => p.usuario === usuario);
   const partidasGenerales = partidas;
 
+  // Función para obtener nombre o email desde p.usuario
+  const mostrarUsuario = (usuarioStr: string) => {
+    try {
+      const u = JSON.parse(usuarioStr);
+      return u.name || u.email || usuarioStr;
+    } catch {
+      return usuarioStr; // si no es JSON válido
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Listado de Partidas</h1>
@@ -53,7 +63,7 @@ export default function PartidasPage() {
                 className="mb-4 p-4 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow"
               >
                 <p>
-                  <span className="font-semibold">Usuario:</span> {p.usuario.split("@")[0]}
+                  <span className="font-semibold">Usuario:</span> {mostrarUsuario(p.usuario)}
                 </p>
                 <p>
                   <span className="font-semibold">Fecha:</span> {p.fecha}
@@ -91,7 +101,7 @@ export default function PartidasPage() {
                 className="mb-4 p-4 border border-gray-300 rounded-lg shadow-sm"
               >
                 <p>
-                  <span className="font-semibold">Usuario:</span> {p.usuario.split("@")[0]}
+                  <span className="font-semibold">Usuario:</span> {mostrarUsuario(p.usuario)}
                 </p>
                 <p>
                   <span className="font-semibold">Fecha:</span> {p.fecha}
