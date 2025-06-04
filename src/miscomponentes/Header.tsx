@@ -11,60 +11,60 @@ import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 
 export function Header() {
-  const [hasToken, setHasToken] = useState(false);
+  const [hasUser, setHasUser] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('token');
+      // Solo con user en localStorage, sin token
       const user = localStorage.getItem('user');
-      setHasToken(!!token);
-      
       if (user) {
         try {
           const parsedUser = JSON.parse(user);
           setUserEmail(parsedUser.email);
+          setHasUser(true);
         } catch (e) {
           console.error('Error al parsear usuario:', e);
           setUserEmail(null);
+          setHasUser(false);
         }
+      } else {
+        setUserEmail(null);
+        setHasUser(false);
       }
     };
 
     checkAuth();
     window.addEventListener('auth-change', checkAuth);
-    
+
     return () => {
       window.removeEventListener('auth-change', checkAuth);
     };
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    // Eliminar solo user porque no usamos token en este sistema
     localStorage.removeItem('user');
-    setHasToken(false);
+    setHasUser(false);
     setUserEmail(null);
-    const event = new Event('auth-change');
-    window.dispatchEvent(event);
+    window.dispatchEvent(new Event('auth-change'));
     router.push('/home');
   };
 
   return (
-    <Menubar className="fixed ">
+    <Menubar className="fixed">
       <MenubarMenu>
         <MenubarTrigger>
           <Link href="/home">Home</Link>
         </MenubarTrigger>
       </MenubarMenu>
       
-      
-        <MenubarMenu>
-          <MenubarTrigger>
-            <Link href="/juego">Juego</Link>
-          </MenubarTrigger>
-        </MenubarMenu>
-      
+      <MenubarMenu>
+        <MenubarTrigger>
+          <Link href="/juego">Juego</Link>
+        </MenubarTrigger>
+      </MenubarMenu>
       
       <MenubarMenu>
         <MenubarTrigger>
@@ -72,7 +72,7 @@ export function Header() {
         </MenubarTrigger>
       </MenubarMenu>
 
-      {hasToken ? (
+      {hasUser ? (
         <MenubarMenu>
           <MenubarTrigger>
             <span>👤 {userEmail}</span>
